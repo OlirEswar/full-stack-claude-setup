@@ -11,6 +11,9 @@ import type { UnitContent } from '../types.ts';
 // --- pack A imports (U1–U3) ---
 
 // --- pack B imports (U4–U6) ---
+import u04 from './u04-second-order.ts';
+import u05 from './u05-stability.ts';
+import u06 from './u06-steady-state-error.ts';
 
 // --- pack C imports (U7–U9) ---
 
@@ -20,6 +23,9 @@ export const UNIT_CONTENT: UnitContent[] = [
   // --- pack A entries (U1–U3) ---
 
   // --- pack B entries (U4–U6) ---
+  u04,
+  u05,
+  u06,
 
   // --- pack C entries (U7–U9) ---
 
