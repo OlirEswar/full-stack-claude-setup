@@ -24,6 +24,8 @@ import u08 from './u08-frequency-response.ts';
 import u09 from './u09-nyquist-margins.ts';
 
 // --- pack D imports (U10–U11) ---
+import u10Pid from './u10-pid.ts';
+import u11StateSpace from './u11-state-space.ts';
 
 export const UNIT_CONTENT: UnitContent[] = [
   // --- pack A entries (U1–U3) ---
@@ -42,4 +44,6 @@ export const UNIT_CONTENT: UnitContent[] = [
   u09,
 
   // --- pack D entries (U10–U11) ---
+  u10Pid,
+  u11StateSpace,
 ];
