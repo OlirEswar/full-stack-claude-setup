@@ -6,6 +6,7 @@ import {
   startSession,
   type SessionDeps,
 } from '../services/sessions.ts';
+import { completeSession } from '../services/complete.ts';
 
 function parseId(raw: unknown): number | null {
   if (typeof raw !== 'string' || !/^[1-9]\d{0,15}$/.test(raw)) return null;
@@ -42,5 +43,11 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
     const id = parseId(request.params.id);
     if (id === null) return reply.code(404).send({ error: 'Session not found' });
     return handle(reply, () => answerQuestion(deps(), request.user!.id, id, request.body));
+  });
+
+  app.post('/api/sessions/:id/complete', async (request: FastifyRequest<{ Params: { id: string } }>, reply) => {
+    const id = parseId(request.params.id);
+    if (id === null) return reply.code(404).send({ error: 'Session not found' });
+    return handle(reply, () => completeSession({ db: app.db, now: app.now() }, request.user!, id));
   });
 }

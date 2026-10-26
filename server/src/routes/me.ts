@@ -2,6 +2,8 @@ import type { FastifyInstance } from 'fastify';
 import type { Db } from '../db/index.ts';
 import type { AuthUser } from '../auth/plugin.ts';
 import { getHearts, MAX_HEARTS } from '../services/hearts.ts';
+import { displayedStreak } from '../services/complete.ts';
+import { isDailyGoalMet, localDate, xpForDate } from '../services/xp.ts';
 
 export { HEART_REGEN_MS, MAX_HEARTS } from '../services/hearts.ts';
 export const DAILY_XP_GOALS = [10, 20, 30, 50] as const;
@@ -16,16 +18,6 @@ export function normalizeTimeZone(tz: unknown): string | null {
   }
 }
 
-/** YYYY-MM-DD for `now` in time zone `tz`. */
-export function localDate(now: Date, tz: string): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(
-    now,
-  );
-}
-
-function dayDiff(a: string, b: string): number {
-  return Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000);
-}
 
 interface StatsRow {
   xp_total: number;
@@ -50,19 +42,11 @@ export function buildMeResponse(db: Db, user: AuthUser, now: Date) {
   };
 
   const today = localDate(now, user.timezone);
-  const xpRow = db
-    .prepare('SELECT COALESCE(SUM(amount), 0) AS xp FROM xp_events WHERE user_id = ? AND local_date = ?')
-    .get(user.id, today) as { xp: number };
-  const xpToday = Number(xpRow.xp);
+  const xpToday = xpForDate(db, user.id, today);
 
   const { hearts, nextHeartAt } = getHearts(db, user.id, now);
 
-  // Displayed streak is 0 if the gap since the last counted day can't be covered by freezes.
-  let streak = s.streak_current;
-  if (s.streak_last_date) {
-    const missed = dayDiff(s.streak_last_date, today) - 1;
-    if (missed > s.streak_freezes) streak = 0;
-  }
+  const streak = displayedStreak(s.streak_current, s.streak_last_date, s.streak_freezes, today);
 
   const daily = db
     .prepare('SELECT completed_at FROM daily_challenges WHERE user_id = ? AND local_date = ?')
@@ -74,7 +58,7 @@ export function buildMeResponse(db: Db, user: AuthUser, now: Date) {
       xpTotal: s.xp_total,
       xpToday,
       dailyXpGoal: user.dailyXpGoal,
-      dailyGoalMet: xpToday >= user.dailyXpGoal,
+      dailyGoalMet: isDailyGoalMet(xpToday, user.dailyXpGoal),
       streak,
       longestStreak: s.streak_longest,
       streakFreezes: s.streak_freezes,

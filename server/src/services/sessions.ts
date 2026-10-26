@@ -4,7 +4,7 @@
  * `session_items.client_payload` holds only the whitelisted client fields
  * produced by `toClientQuestion`, `answer_key` holds the display-order key.
  *
- * Completion (XP, levels, spaced repetition) is handled separately (task 12).
+ * Completion (XP, levels, spaced repetition) lives in services/complete.ts.
  * Practice and mistakes sessions are not implemented yet (task 14): starting
  * them yields 501.
  *
@@ -22,6 +22,7 @@ import { instantiate, RECENT_WINDOW_DAYS, selectQuestionsForSkill, type Selected
 import { DAY_MS } from '../engine/spaced.ts';
 import { getAllSkillProgress, getSkillProgress, isUnlocked, upsertSkillProgress } from './progress.ts';
 import { getHearts, loseHeart, syncHearts } from './hearts.ts';
+import { localDate } from './xp.ts';
 
 export const LESSON_SIZE = 8;
 /** Combo bonus: +2 XP every time the combo reaches a multiple of 5. */
@@ -61,7 +62,7 @@ export interface SessionSummaryView {
   hearts: number;
 }
 
-interface SessionRow {
+export interface SessionRow {
   id: number;
   user_id: number;
   kind: SessionKind;
@@ -73,7 +74,7 @@ interface SessionRow {
   hearts_lost: number;
 }
 
-interface ItemRow {
+export interface ItemRow {
   id: number;
   session_id: number;
   position: number;
@@ -86,14 +87,8 @@ interface ItemRow {
   response: string | null;
 }
 
-/** YYYY-MM-DD for `now` in time zone `tz`. */
-function localDate(now: Date, tz: string): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(
-    now,
-  );
-}
-
-function tx<T>(db: Db, fn: () => T): T {
+/** Run `fn` inside a transaction (BEGIN/COMMIT, ROLLBACK on throw). */
+export function tx<T>(db: Db, fn: () => T): T {
   db.exec('BEGIN');
   try {
     const out = fn();
@@ -142,7 +137,7 @@ function sessionView(db: Db, row: SessionRow, now: Date): SessionSummaryView {
   };
 }
 
-function loadOwnedSession(db: Db, userId: number, sessionId: number): SessionRow {
+export function loadOwnedSession(db: Db, userId: number, sessionId: number): SessionRow {
   const row = db
     .prepare(
       'SELECT id, user_id, kind, skill_id, status, total, combo, max_combo, hearts_lost FROM sessions WHERE id = ?',

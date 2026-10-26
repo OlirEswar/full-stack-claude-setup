@@ -131,6 +131,13 @@ export const migrations: Migration[] = [
       );
     `,
   },
+  {
+    version: 2,
+    name: 'session completion summary',
+    // The completion summary is stored so POST /api/sessions/:id/complete is idempotent
+    // (point-in-time fields like levelUp/streakExtended can't be recomputed later).
+    sql: `ALTER TABLE sessions ADD COLUMN summary TEXT NULL;`,
+  },
 ];
 
 /** Apply any migrations not yet recorded in schema_migrations. Safe to call repeatedly. */
