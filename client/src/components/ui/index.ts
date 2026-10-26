@@ -7,3 +7,4 @@ export { Text, type TextProps, type TextTone } from './Text';
 export { EmptyState, ErrorState, LoadingState, type EmptyStateProps, type ErrorStateProps, type LoadingStateProps } from './states';
 export { StepResponseMark, type StepResponseMarkProps } from './StepResponseMark';
 export { AlertGlyph, BoltGlyph, FlameGlyph, HeartGlyph, type GlyphProps } from './icons';
+export { TextField, type TextFieldProps } from './TextField';
