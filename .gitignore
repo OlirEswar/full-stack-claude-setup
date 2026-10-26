@@ -7,3 +7,4 @@ server/data/
 client/dist/
 .expo/
 .claude/worktrees/
+client/.claude/
