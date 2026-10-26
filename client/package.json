@@ -16,6 +16,8 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@expo-google-fonts/jetbrains-mono": "^0.4.1",
+    "@expo-google-fonts/nunito": "^0.4.2",
     "@expo/metro-runtime": "~58.0.15",
     "expo": "~58.0.19",
     "expo-constants": "~58.0.13",
