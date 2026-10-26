@@ -12,6 +12,7 @@ services:
       - .env
     volumes:
       - ..:/workspace:cached
+      - claude-config:/home/node/.claude
     command: ["sleep", "infinity"]
     depends_on:
       - db
@@ -38,3 +39,4 @@ networks:
 
 volumes:
   db-data:
+  claude-config:

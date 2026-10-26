@@ -24,6 +24,8 @@ ALLOWED_DOMAINS=(
   files.pythonhosted.org
   api.anthropic.com
   statsig.anthropic.com
+  console.anthropic.com
+  claude.ai
 )
 
 ipset destroy allowed-egress 2>/dev/null || true
