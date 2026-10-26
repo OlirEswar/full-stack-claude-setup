@@ -15,6 +15,8 @@ import type { UnitContent } from '../types.ts';
 // --- pack C imports (U7–U9) ---
 
 // --- pack D imports (U10–U11) ---
+import u10Pid from './u10-pid.ts';
+import u11StateSpace from './u11-state-space.ts';
 
 export const UNIT_CONTENT: UnitContent[] = [
   // --- pack A entries (U1–U3) ---
@@ -24,4 +26,6 @@ export const UNIT_CONTENT: UnitContent[] = [
   // --- pack C entries (U7–U9) ---
 
   // --- pack D entries (U10–U11) ---
+  u10Pid,
+  u11StateSpace,
 ];
