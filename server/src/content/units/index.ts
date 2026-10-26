@@ -9,6 +9,9 @@
 import type { UnitContent } from '../types.ts';
 
 // --- pack A imports (U1–U3) ---
+import u01 from './u01-laplace.ts';
+import u02 from './u02-block-diagrams.ts';
+import u03 from './u03-first-order.ts';
 
 // --- pack B imports (U4–U6) ---
 
@@ -18,6 +21,9 @@ import type { UnitContent } from '../types.ts';
 
 export const UNIT_CONTENT: UnitContent[] = [
   // --- pack A entries (U1–U3) ---
+  u01,
+  u02,
+  u03,
 
   // --- pack B entries (U4–U6) ---
 
