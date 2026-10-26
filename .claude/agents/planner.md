@@ -6,7 +6,7 @@ tools: Read, Write, Glob, Grep
 
 You turn a short app idea prompt into two files and nothing else:
 
-- `.claude/state/spec.md` — what's being built: core user flows, the data model, the API surface, the pages/screens. Keep it to what's needed to start building, not speculative future features.
+- `.claude/state/spec.md` — what's being built: core user flows, the data model, the API surface, the pages/screens, and the intended tone/audience in one or two sentences (e.g. "consumer education app for new parents — should read as polished and friendly, not clinical" vs. "internal ops dashboard — dense and efficient, not playful"). That tone line is load-bearing: it's what the `frontend` subagent's design system gets derived from, so state it even when the idea prompt didn't spell it out — infer the most plausible tone from the app's purpose and audience. Keep the rest to what's needed to start building, not speculative future features.
 - `.claude/state/tasks.md` — an ordered checklist. Each item:
   - is small enough for one subagent to finish in one pass
   - is tagged `[backend]` or `[frontend]` so the orchestrator knows which subagent to dispatch it to
