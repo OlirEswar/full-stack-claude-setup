@@ -1,6 +1,9 @@
 import cors from '@fastify/cors';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { openDb, type Db } from './db/index.ts';
+import { installAuth } from './auth/plugin.ts';
+import { authRoutes } from './routes/auth.ts';
+import { meRoutes } from './routes/me.ts';
 
 export interface BuildAppOptions {
   /** SQLite file path, or ':memory:' for tests. */
@@ -38,6 +41,10 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(cors, { origin: true });
 
   app.get('/health', async () => ({ ok: true }));
+
+  installAuth(app);
+  await app.register(authRoutes);
+  await app.register(meRoutes);
 
   return app;
 }
