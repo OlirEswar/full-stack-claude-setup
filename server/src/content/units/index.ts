@@ -14,6 +14,9 @@ import u02 from './u02-block-diagrams.ts';
 import u03 from './u03-first-order.ts';
 
 // --- pack B imports (U4–U6) ---
+import u04 from './u04-second-order.ts';
+import u05 from './u05-stability.ts';
+import u06 from './u06-steady-state-error.ts';
 
 // --- pack C imports (U7–U9) ---
 
@@ -26,6 +29,9 @@ export const UNIT_CONTENT: UnitContent[] = [
   u03,
 
   // --- pack B entries (U4–U6) ---
+  u04,
+  u05,
+  u06,
 
   // --- pack C entries (U7–U9) ---
 
