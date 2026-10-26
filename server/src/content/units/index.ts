@@ -19,6 +19,9 @@ import u05 from './u05-stability.ts';
 import u06 from './u06-steady-state-error.ts';
 
 // --- pack C imports (U7–U9) ---
+import u07 from './u07-root-locus.ts';
+import u08 from './u08-frequency-response.ts';
+import u09 from './u09-nyquist-margins.ts';
 
 // --- pack D imports (U10–U11) ---
 
@@ -34,6 +37,9 @@ export const UNIT_CONTENT: UnitContent[] = [
   u06,
 
   // --- pack C entries (U7–U9) ---
+  u07,
+  u08,
+  u09,
 
   // --- pack D entries (U10–U11) ---
 ];
