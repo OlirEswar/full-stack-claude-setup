@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm
 # Network tools for the egress firewall, Postgres client, Python for
 # scripting/tooling, gosu to drop root -> node after firewall setup.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      iptables ipset dnsutils curl ca-certificates gnupg dnsmasq \
+      iptables ipset dnsutils curl ca-certificates gnupg dnsmasq jq \
       postgresql-client python3 python3-pip python3-venv gosu \
     && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
     && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \

@@ -1,0 +1,48 @@
+{
+    "permissions": {
+      "allow": [
+        "Edit",
+        "Write",
+        "MultiEdit",
+        "Bash(gh issue create:*)",
+        "Bash(gh issue list:*)",
+        "Bash(gh issue view:*)",
+        "Bash(gh pr create:*)",
+        "Bash(gh pr view:*)",
+        "Bash(gh pr list:*)",
+        "Bash(git checkout -b:*)",
+        "Bash(git add:*)",
+        "Bash(git commit:*)",
+        "Bash(git push:*)",
+        "Bash(git status:*)",
+        "Bash(git diff:*)",
+        "Bash(git log:*)",
+        "Bash(npm:*)",
+        "Bash(pnpm:*)",
+        "Bash(npx:*)",
+        "Bash(python3:*)",
+        "Bash(pip:*)"
+      ],
+      "deny": [
+        "Bash(git push --force*)",
+        "Bash(git push -f*)",
+        "Bash(gh pr merge:*)",
+        "Bash(gh repo delete:*)",
+        "Bash(git reset --hard*)",
+        "Bash(git branch -D*)",
+        "Bash(git checkout main)",
+        "Bash(git checkout -- .*)",
+        "Bash(rm -rf*)"
+      ]
+    },
+    "hooks": {
+      "PreToolUse": [
+        {
+          "matcher": "Edit|Write|MultiEdit",
+          "hooks": [
+            { "type": "command", "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/protect-sensitive-paths.sh" }
+          ]
+        }
+      ]
+    }
+  }
