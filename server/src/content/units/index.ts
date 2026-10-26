@@ -13,6 +13,9 @@ import type { UnitContent } from '../types.ts';
 // --- pack B imports (U4–U6) ---
 
 // --- pack C imports (U7–U9) ---
+import u07 from './u07-root-locus.ts';
+import u08 from './u08-frequency-response.ts';
+import u09 from './u09-nyquist-margins.ts';
 
 // --- pack D imports (U10–U11) ---
 
@@ -22,6 +25,9 @@ export const UNIT_CONTENT: UnitContent[] = [
   // --- pack B entries (U4–U6) ---
 
   // --- pack C entries (U7–U9) ---
+  u07,
+  u08,
+  u09,
 
   // --- pack D entries (U10–U11) ---
 ];
