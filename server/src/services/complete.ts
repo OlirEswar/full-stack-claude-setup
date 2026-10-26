@@ -20,7 +20,12 @@ import type { Db } from '../db/index.ts';
 import { scheduleAfterSession } from '../engine/spaced.ts';
 import { getSkillProgress, LESSONS_PER_LEVEL, MAX_LEVEL, upsertSkillProgress } from './progress.ts';
 import { comboBonusFor, loadOwnedSession, SessionError, tx, type SessionKind, type SessionRow } from './sessions.ts';
+import { dailyStreakHook } from './daily.ts';
+import { displayStreak } from './streak.ts';
 import { awardXp, ensureUserStats, isDailyGoalMet, localDate, xpForDate } from './xp.ts';
+
+/** Moved to services/streak.ts; re-exported for existing importers. */
+export { displayedStreak } from './streak.ts';
 
 export interface XpRule {
   base: number;
@@ -124,17 +129,6 @@ export function advanceLevel(level: number, lessonsInLevel: number): { level: nu
   return { level, lessonsInLevel: n };
 }
 
-function dayDiff(a: string, b: string): number {
-  return Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000);
-}
-
-/** Displayed streak: 0 if the gap since the last counted day can't be covered by freezes. */
-export function displayedStreak(current: number, lastDate: string | null, freezes: number, today: string): number {
-  if (!lastDate) return current;
-  const missed = dayDiff(lastDate, today) - 1;
-  return missed > freezes ? 0 : current;
-}
-
 // ---------------------------------------------------------------------------
 // Hooks
 // ---------------------------------------------------------------------------
@@ -176,11 +170,15 @@ export const spacedRepetitionHook: CompletionHook = (ctx) => {
 export const achievementsHook: CompletionHook = () => {};
 
 /**
- * Ordered post-completion hooks. Later tasks insert theirs here (streak for
- * 'daily', heart refill for 'practice'/'mistakes'); achievements stay last so
- * they see the final state.
+ * Ordered post-completion hooks. Later tasks insert theirs here (heart refill
+ * for 'practice'/'mistakes'); achievements stay last so they see the final state.
  */
-export const COMPLETION_HOOKS: CompletionHook[] = [lessonProgressHook, spacedRepetitionHook, achievementsHook];
+export const COMPLETION_HOOKS: CompletionHook[] = [
+  lessonProgressHook,
+  spacedRepetitionHook,
+  dailyStreakHook,
+  achievementsHook,
+];
 
 // ---------------------------------------------------------------------------
 // Service
@@ -245,7 +243,10 @@ export function completeSession(deps: CompleteDeps, user: CompletionUser, sessio
       accuracy: items.length > 0 ? correct / items.length : 0,
       maxCombo,
       perfect,
-      streak: displayedStreak(streakRow.streak_current, streakRow.streak_last_date, streakRow.streak_freezes, date),
+      streak: displayStreak(
+        { current: streakRow.streak_current, lastDate: streakRow.streak_last_date, freezes: streakRow.streak_freezes },
+        date,
+      ),
       streakExtended: false,
       dailyGoalMet: false,
       xpToday: 0,

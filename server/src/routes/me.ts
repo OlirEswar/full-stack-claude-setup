@@ -2,7 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import type { Db } from '../db/index.ts';
 import type { AuthUser } from '../auth/plugin.ts';
 import { getHearts, MAX_HEARTS } from '../services/hearts.ts';
-import { displayedStreak } from '../services/complete.ts';
+import { displayStreak } from '../services/streak.ts';
 import { isDailyGoalMet, localDate, xpForDate } from '../services/xp.ts';
 
 export { HEART_REGEN_MS, MAX_HEARTS } from '../services/hearts.ts';
@@ -46,7 +46,10 @@ export function buildMeResponse(db: Db, user: AuthUser, now: Date) {
 
   const { hearts, nextHeartAt } = getHearts(db, user.id, now);
 
-  const streak = displayedStreak(s.streak_current, s.streak_last_date, s.streak_freezes, today);
+  const streak = displayStreak(
+    { current: s.streak_current, lastDate: s.streak_last_date, freezes: s.streak_freezes },
+    today,
+  );
 
   const daily = db
     .prepare('SELECT completed_at FROM daily_challenges WHERE user_id = ? AND local_date = ?')

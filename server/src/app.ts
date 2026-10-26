@@ -3,6 +3,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import { openDb, type Db } from './db/index.ts';
 import { installAuth } from './auth/plugin.ts';
 import { authRoutes } from './routes/auth.ts';
+import { dailyRoutes } from './routes/daily.ts';
 import { meRoutes } from './routes/me.ts';
 import { pathRoutes } from './routes/path.ts';
 import { sessionRoutes } from './routes/sessions.ts';
@@ -55,6 +56,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(meRoutes);
   await app.register(pathRoutes);
   await app.register(sessionRoutes);
+  await app.register(dailyRoutes);
 
   return app;
 }
