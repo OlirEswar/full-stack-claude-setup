@@ -5,6 +5,8 @@ import { installAuth } from './auth/plugin.ts';
 import { authRoutes } from './routes/auth.ts';
 import { meRoutes } from './routes/me.ts';
 import { pathRoutes } from './routes/path.ts';
+import { sessionRoutes } from './routes/sessions.ts';
+import { registry as defaultRegistry, type ContentRegistry } from './content/registry.ts';
 
 export interface BuildAppOptions {
   /** SQLite file path, or ':memory:' for tests. */
@@ -13,6 +15,8 @@ export interface BuildAppOptions {
   now?: () => Date;
   /** Injectable RNG in [0, 1) for deterministic tests. */
   rng?: () => number;
+  /** Content registry; defaults to the app-wide one built from `content/units/`. Tests inject fixtures. */
+  registry?: ContentRegistry;
   /** Enable Fastify request logging. */
   logger?: boolean;
 }
@@ -23,6 +27,8 @@ declare module 'fastify' {
     db: Db;
     now: () => Date;
     rng: () => number;
+    /** Content registry. Services must use this, never the module-level import. */
+    registry: ContentRegistry;
   }
 }
 
@@ -32,6 +38,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   app.decorate('config', { dbPath: opts.dbPath });
   app.decorate('now', opts.now ?? (() => new Date()));
   app.decorate('rng', opts.rng ?? Math.random);
+  app.decorate('registry', opts.registry ?? defaultRegistry);
 
   const db = openDb(opts.dbPath);
   app.decorate('db', db);
@@ -47,6 +54,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(authRoutes);
   await app.register(meRoutes);
   await app.register(pathRoutes);
+  await app.register(sessionRoutes);
 
   return app;
 }

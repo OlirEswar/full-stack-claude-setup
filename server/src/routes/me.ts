@@ -1,9 +1,9 @@
 import type { FastifyInstance } from 'fastify';
 import type { Db } from '../db/index.ts';
 import type { AuthUser } from '../auth/plugin.ts';
+import { getHearts, MAX_HEARTS } from '../services/hearts.ts';
 
-export const MAX_HEARTS = 5;
-export const HEART_REGEN_MS = 30 * 60 * 1000;
+export { HEART_REGEN_MS, MAX_HEARTS } from '../services/hearts.ts';
 export const DAILY_XP_GOALS = [10, 20, 30, 50] as const;
 
 /** Returns the canonical IANA name if `tz` is a valid time zone, else null. */
@@ -29,8 +29,6 @@ function dayDiff(a: string, b: string): number {
 
 interface StatsRow {
   xp_total: number;
-  hearts: number;
-  hearts_updated_at: string | null;
   streak_current: number;
   streak_longest: number;
   streak_last_date: string | null;
@@ -40,13 +38,11 @@ interface StatsRow {
 export function buildMeResponse(db: Db, user: AuthUser, now: Date) {
   const s = (db
     .prepare(
-      `SELECT xp_total, hearts, hearts_updated_at, streak_current, streak_longest, streak_last_date, streak_freezes
+      `SELECT xp_total, streak_current, streak_longest, streak_last_date, streak_freezes
        FROM user_stats WHERE user_id = ?`,
     )
     .get(user.id) as StatsRow | undefined) ?? {
     xp_total: 0,
-    hearts: MAX_HEARTS,
-    hearts_updated_at: null,
     streak_current: 0,
     streak_longest: 0,
     streak_last_date: null,
@@ -59,16 +55,7 @@ export function buildMeResponse(db: Db, user: AuthUser, now: Date) {
     .get(user.id, today) as { xp: number };
   const xpToday = Number(xpRow.xp);
 
-  // Lazy heart regeneration (read-only view).
-  let hearts = Math.min(s.hearts, MAX_HEARTS);
-  let nextHeartAt: string | null = null;
-  if (hearts < MAX_HEARTS && s.hearts_updated_at) {
-    const since = Date.parse(s.hearts_updated_at);
-    const elapsed = Math.max(0, now.getTime() - since);
-    const regen = Math.floor(elapsed / HEART_REGEN_MS);
-    hearts = Math.min(MAX_HEARTS, hearts + regen);
-    if (hearts < MAX_HEARTS) nextHeartAt = new Date(since + (regen + 1) * HEART_REGEN_MS).toISOString();
-  }
+  const { hearts, nextHeartAt } = getHearts(db, user.id, now);
 
   // Displayed streak is 0 if the gap since the last counted day can't be covered by freezes.
   let streak = s.streak_current;
