@@ -4,6 +4,7 @@ import { openDb, type Db } from './db/index.ts';
 import { installAuth } from './auth/plugin.ts';
 import { authRoutes } from './routes/auth.ts';
 import { meRoutes } from './routes/me.ts';
+import { pathRoutes } from './routes/path.ts';
 
 export interface BuildAppOptions {
   /** SQLite file path, or ':memory:' for tests. */
@@ -45,6 +46,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   installAuth(app);
   await app.register(authRoutes);
   await app.register(meRoutes);
+  await app.register(pathRoutes);
 
   return app;
 }
