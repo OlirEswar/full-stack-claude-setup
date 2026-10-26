@@ -1,0 +1,40 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # NET_ADMIN/NET_RAW (not --privileged) is the minimum needed for the
+    # entrypoint to set up the egress firewall with iptables/ipset.
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    env_file:
+      - .env
+    volumes:
+      - ..:/workspace:cached
+    command: ["sleep", "infinity"]
+    depends_on:
+      - db
+    networks:
+      - devnet
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - devnet
+    # Deliberately not published to the host — only the app container can reach it,
+    # over the compose-internal network the firewall allowlists by subnet.
+
+networks:
+  devnet:
+    driver: bridge
+
+volumes:
+  db-data:

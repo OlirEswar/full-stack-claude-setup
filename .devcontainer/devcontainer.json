@@ -1,0 +1,24 @@
+{
+  "name": "full-stack-agent",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  // Attach as the unprivileged user; the firewall is already applied by the
+  // container's entrypoint (running as root) before this user ever runs a command.
+  "remoteUser": "node",
+
+  // Git identity + a sanity check that GH_TOKEN made it into the container env.
+  "postCreateCommand": "git config --global user.name \"${GIT_AUTHOR_NAME:-claude-agent}\" && git config --global user.email \"${GIT_AUTHOR_EMAIL:-agent@example.com}\" && git config --global --add safe.directory /workspace && (gh auth status || echo 'NOTE: GH_TOKEN is not set/valid yet — fill in .devcontainer/.env')",
+
+  // Only the app's dev server port is forwarded; Postgres stays internal to the compose network.
+  "forwardPorts": [3000],
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  },
+
+  "shutdownAction": "stopCompose"
+}
