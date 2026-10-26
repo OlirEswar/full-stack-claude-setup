@@ -79,6 +79,10 @@ Rounded and layered: chunky, tactile and toy-like in shape, precise in content.
   token exists for modals/sheets only.
 - Borders: 2px is the standard stroke weight for borders, dividers and icons.
 
+## Text field
+
+`TextField` (`client/src/components/ui/TextField.tsx`) uses the card vocabulary: label above, 2px `ink` border with a 4px bottom edge, `radii` from the shape scale. Focus turns the edge Loop Violet (`colors.primary`); an error turns it `colors.error` and replaces the hint with the error copy. `secure` adds a Show/Hide toggle. Use it for every free-text input (auth, numeric answers) rather than a bare `TextInput`.
+
 ## Spacing
 
 4-pt scale: `xxs 2`, `xs 4`, `sm 8`, `md 12`, `lg 16`, `xl 24`, `xxl 32`, `xxxl 48`.
