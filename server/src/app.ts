@@ -7,6 +7,8 @@ import { dailyRoutes } from './routes/daily.ts';
 import { meRoutes } from './routes/me.ts';
 import { pathRoutes } from './routes/path.ts';
 import { sessionRoutes } from './routes/sessions.ts';
+import { statsRoutes } from './routes/stats.ts';
+import { leaderboardRoutes } from './routes/leaderboard.ts';
 import { registry as defaultRegistry, type ContentRegistry } from './content/registry.ts';
 
 export interface BuildAppOptions {
@@ -57,6 +59,8 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(pathRoutes);
   await app.register(sessionRoutes);
   await app.register(dailyRoutes);
+  await app.register(statsRoutes);
+  await app.register(leaderboardRoutes);
 
   return app;
 }
