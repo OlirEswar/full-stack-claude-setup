@@ -50,6 +50,8 @@ export function RootNavigator() {
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Protected guard={isAuthenticated} redirectTo="/login">
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="session/[id]" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="session/summary" options={{ gestureEnabled: false }} />
       </Stack.Protected>
       <Stack.Protected guard={!isAuthenticated} redirectTo="/">
         <Stack.Screen name="(auth)" />
