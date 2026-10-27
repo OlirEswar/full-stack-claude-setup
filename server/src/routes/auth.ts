@@ -1,6 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 import { dummyVerify, hashPassword, verifyPassword } from '../auth/password.ts';
 import { issueToken, revokeToken } from '../auth/tokens.ts';
+import { tx } from '../services/sessions.ts';
+import { ensureUserStats } from '../services/xp.ts';
 import { normalizeTimeZone } from './me.ts';
 
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
@@ -38,7 +40,7 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
       return reply.code(400).send({ error: 'Username must be 3-20 characters: letters, digits, underscore' });
     }
     if (typeof password !== 'string' || password.length < MIN_PASSWORD || password.length > MAX_PASSWORD) {
-      return reply.code(400).send({ error: `Password must be at least ${MIN_PASSWORD} characters` });
+      return reply.code(400).send({ error: `Password must be ${MIN_PASSWORD}-${MAX_PASSWORD} characters` });
     }
     let tz = 'UTC';
     if (timezone !== undefined && timezone !== null) {
@@ -54,19 +56,16 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     const now = app.now();
     const db = app.db;
     let userId: number;
-    db.exec('BEGIN');
     try {
-      const res = db
-        .prepare('INSERT INTO users (username, password_hash, password_salt, timezone, created_at) VALUES (?, ?, ?, ?, ?)')
-        .run(username, hash, salt, tz, now.toISOString());
-      userId = Number(res.lastInsertRowid);
-      db.prepare('INSERT INTO user_stats (user_id, hearts, streak_current, hearts_updated_at) VALUES (?, 5, 0, ?)').run(
-        userId,
-        now.toISOString(),
-      );
-      db.exec('COMMIT');
+      userId = tx(db, () => {
+        const res = db
+          .prepare('INSERT INTO users (username, password_hash, password_salt, timezone, created_at) VALUES (?, ?, ?, ?, ?)')
+          .run(username, hash, salt, tz, now.toISOString());
+        const id = Number(res.lastInsertRowid);
+        ensureUserStats(db, id, now);
+        return id;
+      });
     } catch (err) {
-      db.exec('ROLLBACK');
       // Lost a race with a concurrent registration of the same name.
       if (isUniqueViolation(err)) return reply.code(409).send({ error: 'Username already taken' });
       throw err;

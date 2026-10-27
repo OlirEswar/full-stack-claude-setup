@@ -16,6 +16,7 @@ import {
   getSessionState,
   recentStaticIds,
   SessionError,
+  tx,
   type SessionDeps,
   type SessionUser,
   type StartResult,
@@ -82,12 +83,12 @@ export function startDaily(deps: SessionDeps, user: SessionUser): DailyStartResu
   });
   if (selections.length === 0) throw new SessionError(503, 'No content available for a daily challenge yet');
 
-  const sessionId = createSession(deps, user, 'daily', null, selections);
-  db.prepare('INSERT INTO daily_challenges (user_id, local_date, session_id) VALUES (?, ?, ?)').run(
-    user.id,
-    date,
-    sessionId,
-  );
+  // One transaction, so a failed challenge insert can't leave an orphan 'daily' session.
+  const sessionId = tx(db, () => {
+    const id = createSession(deps, user, 'daily', null, selections);
+    db.prepare('INSERT INTO daily_challenges (user_id, local_date, session_id) VALUES (?, ?, ?)').run(user.id, date, id);
+    return id;
+  });
   const { session, question } = getSessionState(deps, user.id, sessionId);
   return { session, question };
 }

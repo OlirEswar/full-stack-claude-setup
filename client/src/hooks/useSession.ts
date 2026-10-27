@@ -118,6 +118,8 @@ export function useSession(sessionId: number) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const shownAt = useRef(0);
   const alive = useRef(true);
+  /** Set while an answer is in flight: `state` in the closure is stale until re-render, so a double tap would submit twice. */
+  const checking = useRef(false);
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -165,7 +167,8 @@ export function useSession(sessionId: number) {
 
   const check = useCallback(async () => {
     const { phase, question, response } = state;
-    if (phase !== 'answering' || !question || !response) return;
+    if (checking.current || phase !== 'answering' || !question || !response) return;
+    checking.current = true;
     dispatch({ type: 'checking' });
     try {
       const result = await submitAnswer(sessionId, {
@@ -178,6 +181,8 @@ export function useSession(sessionId: number) {
       dispatch({ type: 'checked', result });
     } catch (e) {
       if (alive.current) dispatch({ type: 'checkError', message: messageOf(e, 'Couldn’t check that answer. Try again.') });
+    } finally {
+      checking.current = false;
     }
   }, [state, sessionId]);
 

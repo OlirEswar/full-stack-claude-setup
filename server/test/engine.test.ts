@@ -176,6 +176,8 @@ describe('spaced repetition', () => {
     expect(isDue(p, t0.getTime() + 2 * DAY_MS - 1)).toBe(false);
     expect(isDue(p, t0.getTime() + 2 * DAY_MS)).toBe(true);
     expect(isDue({ attempts: 0, nextDueAt: t0 }, t0.getTime() + 10 * DAY_MS)).toBe(false);
+    // Started but never scheduled (e.g. only a failed lesson): not due.
+    expect(isDue({ attempts: 3, nextDueAt: null }, t0.getTime() + 10 * DAY_MS)).toBe(false);
   });
 });
 

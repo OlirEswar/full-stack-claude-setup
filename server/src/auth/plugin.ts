@@ -37,8 +37,9 @@ export function installAuth(app: FastifyInstance): void {
   app.decorateRequest('authToken', null);
 
   app.addHook('preHandler', async (request: FastifyRequest, reply: FastifyReply) => {
-    const path = request.url.split('?')[0]!;
-    if (!path.startsWith('/api/')) return;
+    // Use the matched route pattern, not the raw URL: routing decodes the path,
+    // so a percent-encoded `/%61pi/...` would otherwise reach an /api handler unauthenticated.
+    if (!request.routeOptions.url?.startsWith('/api/')) return;
     if (request.routeOptions.config?.auth === false) return;
 
     const token = extractBearer(request.headers.authorization);

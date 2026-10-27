@@ -52,7 +52,7 @@ export function achievementStats(db: Db, userId: number, overrides: StatsOverrid
     streak_longest: 0,
   };
 
-  const combo = db.prepare('SELECT COALESCE(MAX(max_combo), 0) AS m FROM sessions WHERE user_id = ?').get(userId) as {
+  const combo = db.prepare("SELECT COALESCE(MAX(max_combo), 0) AS m FROM sessions WHERE user_id = ? AND status = 'completed'").get(userId) as {
     m: number;
   };
 

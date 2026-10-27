@@ -1,9 +1,10 @@
-import { fireEvent, renderRouter, screen, waitFor } from 'expo-router/testing-library';
+import { act, fireEvent, renderHook, renderRouter, screen, waitFor } from 'expo-router/testing-library';
 import { Text } from 'react-native';
 
 import * as api from '@/api/client';
 import type { AnswerResult, ClientQuestion, GetSessionResponse, Session, SessionSummary } from '@/api/types';
 import { sessionSummaryCache } from '@/hooks/sessionSummaryCache';
+import { useSession } from '@/hooks/useSession';
 
 import SessionScreen from '../app/session/[id]';
 import SummaryScreen from '../app/session/summary';
@@ -129,6 +130,22 @@ describe('session player', () => {
     // Correct answers don't print the answer again.
     expect(screen.queryByTestId('feedback-correct-answer')).toBeNull();
     expect(screen.queryByTestId('check-button')).toBeNull();
+  });
+
+  it('double-tapping Check submits the answer only once', async () => {
+    // Both taps land before a re-render, so each sees the same stale 'answering' state.
+    mockedApi.getSession.mockResolvedValue({ session, question: q1, answered: 0 });
+    mockedApi.submitAnswer.mockResolvedValue(answer());
+    const { result } = await renderHook(() => useSession(42));
+    await waitFor(() => expect(result.current.phase).toBe('answering'));
+    await act(async () => result.current.select({ choice: 1 }));
+    const { check } = result.current;
+    await act(async () => {
+      await Promise.all([check(), check()]);
+    });
+
+    expect(mockedApi.submitAnswer).toHaveBeenCalledTimes(1);
+    expect(result.current.phase).toBe('feedback');
   });
 
   it('incorrect answer shows correct answer text', async () => {

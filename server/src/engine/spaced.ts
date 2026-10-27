@@ -63,12 +63,15 @@ export function scheduleAfterSession(halfLifeDays: number, accuracy: number, now
   };
 }
 
-/** Due when started (attempts > 0) and now ≥ nextDueAt. */
+/**
+ * Due when started (attempts > 0) and now ≥ nextDueAt. A started skill that was never
+ * scheduled (only failed/abandoned sessions) is not due; it is still picked up as a weak skill.
+ */
 export function isDue(
   progress: { attempts: number; nextDueAt?: TimeLike | null },
   now: TimeLike,
 ): boolean {
   if (!(progress.attempts > 0)) return false;
-  if (progress.nextDueAt === null || progress.nextDueAt === undefined) return true;
+  if (progress.nextDueAt === null || progress.nextDueAt === undefined) return false;
   return toMs(now) >= toMs(progress.nextDueAt);
 }

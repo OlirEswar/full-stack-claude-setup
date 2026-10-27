@@ -62,6 +62,11 @@ describe('auth', () => {
     expect((await register('ALICE')).statusCode).toBe(409);
   });
 
+  it('percent-encoded /api paths still require auth', async () => {
+    const res = await app.inject({ method: 'GET', url: '/%61pi/me' });
+    expect(res.statusCode).toBe(401);
+  });
+
   it('register rejects short password with 400', async () => {
     const res = await register('bob', 'short');
     expect(res.statusCode).toBe(400);

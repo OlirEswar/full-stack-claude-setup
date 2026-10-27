@@ -97,8 +97,13 @@ export interface ItemRow {
 }
 
 /** Run `fn` inside a transaction (BEGIN/COMMIT, ROLLBACK on throw). */
+const inTx = new WeakSet<Db>();
+
+/** Run `fn` in a transaction. Nested calls join the outer transaction. */
 export function tx<T>(db: Db, fn: () => T): T {
+  if (inTx.has(db)) return fn();
   db.exec('BEGIN');
+  inTx.add(db);
   try {
     const out = fn();
     db.exec('COMMIT');
@@ -106,6 +111,8 @@ export function tx<T>(db: Db, fn: () => T): T {
   } catch (err) {
     db.exec('ROLLBACK');
     throw err;
+  } finally {
+    inTx.delete(db);
   }
 }
 

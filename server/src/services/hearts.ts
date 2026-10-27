@@ -10,6 +10,7 @@
  */
 import type { Db } from '../db/index.ts';
 import type { CompletionHook } from './complete.ts';
+import { ensureUserStats } from './xp.ts';
 
 export const MAX_HEARTS = 5;
 export const HEART_REGEN_MS = 30 * 60 * 1000;
@@ -61,14 +62,6 @@ function readRow(db: Db, userId: number): HeartRow {
   return row ?? { hearts: MAX_HEARTS, hearts_updated_at: null };
 }
 
-function ensureRow(db: Db, userId: number, now: Date): void {
-  db.prepare('INSERT OR IGNORE INTO user_stats (user_id, hearts, hearts_updated_at) VALUES (?, ?, ?)').run(
-    userId,
-    MAX_HEARTS,
-    now.toISOString(),
-  );
-}
-
 function write(db: Db, userId: number, hearts: number, anchor: string): void {
   db.prepare('UPDATE user_stats SET hearts = ?, hearts_updated_at = ? WHERE user_id = ?').run(hearts, anchor, userId);
 }
@@ -82,7 +75,7 @@ export function getHearts(db: Db, userId: number, now: Date): HeartState {
 
 /** Persist any regenerated hearts and return the current state. */
 export function syncHearts(db: Db, userId: number, now: Date): HeartState {
-  ensureRow(db, userId, now);
+  ensureUserStats(db, userId, now);
   const row = readRow(db, userId);
   const s = computeHearts(row.hearts, row.hearts_updated_at, now);
   write(db, userId, s.hearts, s.anchor);
@@ -91,7 +84,7 @@ export function syncHearts(db: Db, userId: number, now: Date): HeartState {
 
 /** Spend one heart (never below 0). Dropping from full starts the regen clock now. */
 export function loseHeart(db: Db, userId: number, now: Date): HeartState {
-  ensureRow(db, userId, now);
+  ensureUserStats(db, userId, now);
   const row = readRow(db, userId);
   const s = computeHearts(row.hearts, row.hearts_updated_at, now);
   const hearts = Math.max(0, s.hearts - 1);
@@ -102,7 +95,7 @@ export function loseHeart(db: Db, userId: number, now: Date): HeartState {
 
 /** Add `n` hearts (capped at MAX_HEARTS), e.g. the +1 for completing practice. */
 export function addHearts(db: Db, userId: number, n: number, now: Date): HeartState {
-  ensureRow(db, userId, now);
+  ensureUserStats(db, userId, now);
   const row = readRow(db, userId);
   const s = computeHearts(row.hearts, row.hearts_updated_at, now);
   const hearts = Math.min(MAX_HEARTS, s.hearts + Math.max(0, n));
