@@ -194,7 +194,10 @@ describe('session completion', () => {
       streakExtended: false,
       xpToday: 15,
       levelUp: null,
-      newAchievements: [],
+      newAchievements: [
+        { id: 'first-steps', title: 'First Steps' },
+        { id: 'perfectionist', title: 'Perfectionist' },
+      ],
     });
     const stats = await me();
     expect(stats.xpTotal).toBe(15);

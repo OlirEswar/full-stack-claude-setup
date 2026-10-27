@@ -22,6 +22,7 @@ import { getSkillProgress, LESSONS_PER_LEVEL, MAX_LEVEL, upsertSkillProgress } f
 import { comboBonusFor, loadOwnedSession, SessionError, tx, type SessionKind, type SessionRow } from './sessions.ts';
 import { dailyStreakHook } from './daily.ts';
 import { heartRefillHook } from './hearts.ts';
+import { achievementsHook } from './achievements.ts';
 import { displayStreak } from './streak.ts';
 import { awardXp, ensureUserStats, isDailyGoalMet, localDate, xpForDate } from './xp.ts';
 
@@ -166,9 +167,6 @@ export const spacedRepetitionHook: CompletionHook = (ctx) => {
     });
   }
 };
-
-/** Placeholder for achievements evaluation (task 15): fills `summary.newAchievements`. */
-export const achievementsHook: CompletionHook = () => {};
 
 /**
  * Ordered post-completion hooks. Later tasks insert theirs here (heart refill
