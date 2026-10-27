@@ -25,6 +25,7 @@ jest.mock('@/api/client', () => {
     getPath: jest.fn(offline),
     getDaily: jest.fn(offline),
     getMistakes: jest.fn(offline),
+    getStats: jest.fn(offline),
   };
 });
 
