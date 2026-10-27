@@ -9,6 +9,7 @@ import { pathRoutes } from './routes/path.ts';
 import { sessionRoutes } from './routes/sessions.ts';
 import { statsRoutes } from './routes/stats.ts';
 import { leaderboardRoutes } from './routes/leaderboard.ts';
+import { mistakesRoutes } from './routes/mistakes.ts';
 import { registry as defaultRegistry, type ContentRegistry } from './content/registry.ts';
 
 export interface BuildAppOptions {
@@ -61,6 +62,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
   await app.register(dailyRoutes);
   await app.register(statsRoutes);
   await app.register(leaderboardRoutes);
+  await app.register(mistakesRoutes);
 
   return app;
 }

@@ -21,6 +21,7 @@ import { scheduleAfterSession } from '../engine/spaced.ts';
 import { getSkillProgress, LESSONS_PER_LEVEL, MAX_LEVEL, upsertSkillProgress } from './progress.ts';
 import { comboBonusFor, loadOwnedSession, SessionError, tx, type SessionKind, type SessionRow } from './sessions.ts';
 import { dailyStreakHook } from './daily.ts';
+import { heartRefillHook } from './hearts.ts';
 import { displayStreak } from './streak.ts';
 import { awardXp, ensureUserStats, isDailyGoalMet, localDate, xpForDate } from './xp.ts';
 
@@ -177,6 +178,7 @@ export const COMPLETION_HOOKS: CompletionHook[] = [
   lessonProgressHook,
   spacedRepetitionHook,
   dailyStreakHook,
+  heartRefillHook,
   achievementsHook,
 ];
 

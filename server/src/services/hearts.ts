@@ -9,6 +9,7 @@
  * progress towards the next heart is never lost.
  */
 import type { Db } from '../db/index.ts';
+import type { CompletionHook } from './complete.ts';
 
 export const MAX_HEARTS = 5;
 export const HEART_REGEN_MS = 30 * 60 * 1000;
@@ -109,3 +110,9 @@ export function addHearts(db: Db, userId: number, n: number, now: Date): HeartSt
   write(db, userId, hearts, anchor);
   return computeHearts(hearts, anchor, now);
 }
+
+/** Completion hook: a completed practice or mistakes session refills one heart. */
+export const heartRefillHook: CompletionHook = (ctx) => {
+  if (ctx.failed || (ctx.session.kind !== 'practice' && ctx.session.kind !== 'mistakes')) return;
+  addHearts(ctx.db, ctx.user.id, 1, ctx.now);
+};

@@ -277,7 +277,7 @@ describe('sessions', () => {
       headers: auth(),
       payload: { kind: 'practice' },
     });
-    expect(practice.statusCode).toBe(501);
+    expect(practice.statusCode).toBe(201);
     const unauth = await app.inject({ method: 'POST', url: '/api/sessions', payload: { kind: 'lesson' } });
     expect(unauth.statusCode).toBe(401);
   });

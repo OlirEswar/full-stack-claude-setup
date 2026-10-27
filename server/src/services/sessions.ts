@@ -5,8 +5,9 @@
  * produced by `toClientQuestion`, `answer_key` holds the display-order key.
  *
  * Completion (XP, levels, spaced repetition) lives in services/complete.ts.
- * Practice and mistakes sessions are not implemented yet (task 14): starting
- * them yields 501.
+ * Practice (8 items from due, then weak skills) and mistakes (up to 8 uncleared
+ * mistakes, oldest first; generators re-rolled with a fresh seed) sessions
+ * never cost hearts.
  *
  * Positions are 1-based: the first question has `position: 1`.
  */
@@ -15,16 +16,24 @@ import { getSkill } from '../content/curriculum.ts';
 import { grade, isValidResponse } from '../content/grade.ts';
 import { answerText, toClientQuestion } from '../content/present.ts';
 import type { ContentRegistry } from '../content/registry.ts';
-import type { Rng } from '../content/rng.ts';
+import { randomSeed, type Rng } from '../content/rng.ts';
 import type { AnswerKey, ClientQuestion, ClientQuestionBody, Difficulty } from '../content/types.ts';
 import { updateAbility } from '../engine/ability.ts';
-import { instantiate, RECENT_WINDOW_DAYS, selectQuestionsForSkill, type SelectedQuestion } from '../engine/select.ts';
+import {
+  instantiate,
+  RECENT_WINDOW_DAYS,
+  selectPractice,
+  selectQuestionsForSkill,
+  type SelectedQuestion,
+} from '../engine/select.ts';
 import { DAY_MS } from '../engine/spaced.ts';
 import { getAllSkillProgress, getSkillProgress, isUnlocked, upsertSkillProgress } from './progress.ts';
 import { getHearts, loseHeart, syncHearts } from './hearts.ts';
 import { localDate } from './xp.ts';
 
 export const LESSON_SIZE = 8;
+/** A mistakes session reviews at most this many uncleared mistakes. */
+export const MISTAKES_SIZE = 8;
 /** Combo bonus: +2 XP every time the combo reaches a multiple of 5. */
 export const COMBO_BONUS_EVERY = 5;
 export const COMBO_BONUS_XP = 2;
@@ -212,9 +221,8 @@ export interface StartResult {
 export function startSession(deps: SessionDeps, user: SessionUser, body: unknown): StartResult {
   if (!isObj(body)) throw new SessionError(400, 'Body must be a JSON object');
   const { kind, skillId } = body;
-  if (kind === 'practice' || kind === 'mistakes') {
-    throw new SessionError(501, `Session kind "${kind}" is not implemented yet`);
-  }
+  if (kind === 'practice') return startPractice(deps, user);
+  if (kind === 'mistakes') return startMistakes(deps, user);
   if (kind !== 'lesson') throw new SessionError(400, "kind must be 'lesson', 'practice' or 'mistakes'");
   if (typeof skillId !== 'string' || skillId.length === 0) throw new SessionError(400, 'skillId is required');
   return startLesson(deps, user, skillId);
@@ -235,6 +243,83 @@ function startLesson(deps: SessionDeps, user: SessionUser, skillId: string): Sta
   if (selections.length === 0) throw new SessionError(503, 'No content available for this skill yet');
 
   const id = createSession(deps, user, 'lesson', skillId, selections);
+  return firstQuestion(db, id, now);
+}
+
+function startPractice(deps: SessionDeps, user: SessionUser): StartResult {
+  const { db, registry, now, rng } = deps;
+  const selections = selectPractice({
+    registry,
+    progress: getAllSkillProgress(db, user.id),
+    recentStaticIds: recentStaticIds(db, user.id, now),
+    rng,
+    now,
+  });
+  if (selections.length === 0) throw new SessionError(503, 'No content available for practice yet');
+  const id = createSession(deps, user, 'practice', null, selections);
+  return firstQuestion(db, id, now);
+}
+
+interface MistakeRow {
+  question_ref: string;
+  skill_id: string;
+}
+
+/**
+ * Turn a stored mistake ref back into a selection. Static refs resolve to the
+ * same item; `gen:<id>` refs re-run the generator with a fresh seed at the
+ * difficulty the user last saw it at (falling back to the generator's lowest).
+ * Returns undefined if the content no longer exists.
+ */
+function mistakeSelection(deps: SessionDeps, userId: number, m: MistakeRow): SelectedQuestion | undefined {
+  const { db, registry, rng } = deps;
+  if (!m.question_ref.startsWith('gen:')) {
+    const item = registry.getStaticItem(m.question_ref);
+    if (!item) return undefined;
+    return { source: 'static', ref: item.id, skillId: item.skillId, difficulty: item.difficulty, item };
+  }
+  const generator = registry.getGenerator(m.question_ref.slice('gen:'.length));
+  if (!generator || generator.difficulties.length === 0) return undefined;
+  const last = db
+    .prepare(
+      `SELECT si.difficulty AS d FROM session_items si JOIN sessions s ON s.id = si.session_id
+       WHERE s.user_id = ? AND si.question_ref = ? AND si.answered_at IS NOT NULL
+       ORDER BY si.answered_at DESC, si.id DESC LIMIT 1`,
+    )
+    .get(userId, m.question_ref) as { d: number } | undefined;
+  const difficulty = generator.difficulties.includes(last?.d as Difficulty)
+    ? (last!.d as Difficulty)
+    : [...generator.difficulties].sort((a, b) => a - b)[0]!;
+  return {
+    source: 'generator',
+    ref: m.question_ref,
+    skillId: generator.skillId,
+    difficulty,
+    generator,
+    seed: randomSeed(rng),
+  };
+}
+
+/** Uncleared mistakes, oldest first. */
+export function unclearedMistakes(db: Db, userId: number): (MistakeRow & { last_wrong_at: string })[] {
+  return db
+    .prepare(
+      `SELECT question_ref, skill_id, last_wrong_at FROM mistakes
+       WHERE user_id = ? AND cleared_at IS NULL ORDER BY last_wrong_at ASC, id ASC`,
+    )
+    .all(userId) as unknown as (MistakeRow & { last_wrong_at: string })[];
+}
+
+function startMistakes(deps: SessionDeps, user: SessionUser): StartResult {
+  const { db, now } = deps;
+  const selections: SelectedQuestion[] = [];
+  for (const m of unclearedMistakes(db, user.id)) {
+    if (selections.length >= MISTAKES_SIZE) break;
+    const sel = mistakeSelection(deps, user.id, m);
+    if (sel) selections.push(sel);
+  }
+  if (selections.length === 0) throw new SessionError(409, 'No mistakes to review');
+  const id = createSession(deps, user, 'mistakes', null, selections);
   return firstQuestion(db, id, now);
 }
 
