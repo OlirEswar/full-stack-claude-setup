@@ -166,7 +166,7 @@ Work top to bottom. Read `.claude/state/spec.md` for the data model, API shapes,
     - `completing practice refills one heart`
     - `practice session does not cost hearts`
 
-- [ ] **15. [backend] Achievements**
+- [x] **15. [backend] Achievements**
   - Files: `server/src/content/achievements.ts` (14 definitions from spec with `progress(stats)` fns), `server/src/services/achievements.ts` (`evaluate(userId)` returns newly unlocked; called from completion), `server/src/routes/achievements.ts`, `server/test/achievements.test.ts`.
   - Acceptance: `npm test -w server -- achievements` passes:
     - `GET /api/achievements returns all 14 with progress`
@@ -241,7 +241,7 @@ Work top to bottom. Read `.claude/state/spec.md` for the data model, API shapes,
     - `MatchInput emits {pairs} only when all left items are paired`
     - `QuestionView renders figure when present`
 
-- [ ] **24. [frontend] Session player + feedback sheet + summary screen**
+- [x] **24. [frontend] Session player + feedback sheet + summary screen**
   - Files: `client/app/session/[id].tsx`, `client/app/session/summary.tsx`, `client/src/components/session/` (`SessionHeader` with ProgressBar + hearts + close, `FeedbackSheet` with correct/incorrect styles, correct answer text, explanation, Continue; `ComboBadge` animated at ≥3; `XpCountUp`), `client/src/hooks/useSession.ts` (state machine: answering → checking → feedback → next/ready → complete; failed → out-of-hearts screen), haptics on native only (Platform guard), `client/__tests__/session.test.tsx`.
   - Acceptance: `npm test -w client -- session` passes (API mocked):
     - `Check is disabled until an answer is given`
