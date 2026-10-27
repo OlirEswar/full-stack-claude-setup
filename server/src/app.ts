@@ -51,7 +51,8 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
     if (db.isOpen) db.close();
   });
 
-  await app.register(cors, { origin: true });
+  // @fastify/cors defaults to GET,HEAD,POST; the client also sends PATCH /api/me.
+  await app.register(cors, { origin: true, methods: ['GET', 'HEAD', 'POST', 'PATCH', 'DELETE'] });
 
   app.get('/health', async () => ({ ok: true }));
 

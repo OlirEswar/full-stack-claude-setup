@@ -67,6 +67,15 @@ describe('auth', () => {
     expect(res.statusCode).toBe(401);
   });
 
+  it('CORS preflight allows PATCH from the web client', async () => {
+    const res = await app.inject({
+      method: 'OPTIONS',
+      url: '/api/me',
+      headers: { origin: 'http://localhost:8081', 'access-control-request-method': 'PATCH' },
+    });
+    expect(res.headers['access-control-allow-methods']).toContain('PATCH');
+  });
+
   it('register rejects short password with 400', async () => {
     const res = await register('bob', 'short');
     expect(res.statusCode).toBe(400);
