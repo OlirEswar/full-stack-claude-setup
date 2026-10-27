@@ -186,7 +186,7 @@ Work top to bottom. Read `.claude/state/spec.md` for the data model, API shapes,
     - `leaderboard me shows rank even with 0 XP`
     - `leaderboard isMe flags the caller`
 
-- [ ] **17. [backend] Dev seed script + end-to-end API smoke test**
+- [x] **17. [backend] Dev seed script + end-to-end API smoke test**
   - Files: `server/src/scripts/seed-demo.ts` (creates `demo`/`demopass1` with some progress plus 5 fake leaderboard users), server script `seed`, `server/test/e2e-flow.test.ts`.
   - Acceptance: `npm test -w server -- e2e-flow` passes `full flow: register → path → lesson (answer all) → complete → daily → complete → me shows streak 1 and xp > 0 → leaderboard rank 1`. `npm run seed -w server` exits 0 against a temp `DB_PATH`.
 
