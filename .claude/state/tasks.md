@@ -271,7 +271,7 @@ Work top to bottom. Read `.claude/state/spec.md` for the data model, API shapes,
     - `completed shows done state with streak count`
     - `Start calls startDaily and navigates to session`
 
-- [ ] **27. [frontend] Profile / stats screen**
+- [x] **27. [frontend] Profile / stats screen**
   - Files: `client/app/(tabs)/profile.tsx`, `client/src/components/profile/` (`WeekXpBars` SVG bars, `SkillStatsList`, `DailyGoalPicker` 10/20/30/50 via PATCH /api/me), logout button, `client/__tests__/profile.test.tsx`.
   - Acceptance: `npm test -w client -- profile` passes:
     - `renders total XP, accuracy %, longest streak`
