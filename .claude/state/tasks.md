@@ -279,7 +279,7 @@ Work top to bottom. Read `.claude/state/spec.md` for the data model, API shapes,
     - `changing daily goal calls updateMe with dailyXpGoal`
     - `logout clears token and routes to login`
 
-- [ ] **28. [frontend] Leaderboard + achievements screens**
+- [x] **28. [frontend] Leaderboard + achievements screens**
   - Files: `client/app/(tabs)/leaderboard.tsx`, `client/app/(tabs)/achievements.tsx`, `client/src/components/social/` (`LeaderboardRow` with top-3 medal styling, highlighted `isMe` row; `AchievementBadge` locked/unlocked + progress bar), `client/__tests__/leaderboard.test.tsx`, `client/__tests__/achievements.test.tsx`.
   - Acceptance: `npm test -w client -- leaderboard achievements` passes:
     - `renders ranked entries and highlights me`
