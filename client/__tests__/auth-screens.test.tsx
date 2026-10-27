@@ -136,7 +136,7 @@ describe('login screen', () => {
     await fireEvent.changeText(await screen.findByTestId('login-username'), 'bode_fan');
     await fireEvent.changeText(screen.getByTestId('login-password'), 'hunter22!');
     await fireEvent.press(screen.getByTestId('login-submit'));
-    expect(await screen.findByText(/Can’t reach the Loopy server at http:\/\/localhost:3000/)).toBeTruthy();
+    expect(await screen.findByText(/Can’t reach the Loopy server at http:\/\/localhost:4000/)).toBeTruthy();
   });
 });
 

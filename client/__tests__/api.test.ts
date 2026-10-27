@@ -98,10 +98,10 @@ describe('api client', () => {
     }
   });
 
-  it('defaults to http://localhost:3000', async () => {
+  it('defaults to http://localhost:4000', async () => {
     const fetchMock = mockFetch(jsonResponse(200, meBody));
     await api.getMe();
-    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:3000/api/me');
+    expect(fetchMock.mock.calls[0][0]).toBe('http://localhost:4000/api/me');
   });
 
   it('throws ApiError with status on 401', async () => {
@@ -144,7 +144,7 @@ describe('api client', () => {
     const fetchMock = mockFetch(jsonResponse(201, { token: 't', user }));
     await api.register({ username: 'ada_l', password: 'password1', timezone: 'Europe/Berlin' });
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:3000/api/auth/register');
+    expect(url).toBe('http://localhost:4000/api/auth/register');
     expect(init?.method).toBe('POST');
     expect(headersOf(fetchMock.mock.calls[0])['Content-Type']).toBe('application/json');
     expect(JSON.parse(init?.body as string)).toEqual({
@@ -170,7 +170,7 @@ describe('api client', () => {
     setAuthToken('tok');
     const res = await api.submitAnswer(42, { itemId: 7, response: { choice: 2 }, timeMs: 5300 });
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe('http://localhost:3000/api/sessions/42/answer');
+    expect(url).toBe('http://localhost:4000/api/sessions/42/answer');
     expect(init?.method).toBe('POST');
     expect(JSON.parse(init?.body as string)).toEqual({ itemId: 7, response: { choice: 2 }, timeMs: 5300 });
     expect(res).toEqual(result);

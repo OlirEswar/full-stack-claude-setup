@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { buildApp } from './app.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const port = Number(process.env.PORT ?? 3000);
+const port = Number(process.env.PORT ?? 4000);
 const dbPath = process.env.DB_PATH ?? resolve(here, '../data/loopy.db');
 
 if (dbPath !== ':memory:') mkdirSync(dirname(dbPath), { recursive: true });

@@ -20,20 +20,20 @@ npm install        # at the repo root; installs both workspaces
 ## Run the server
 
 ```sh
-npm run dev -w server     # tsx watch; http://0.0.0.0:3000, health check at GET /health
+npm run dev -w server     # tsx watch; http://0.0.0.0:4000, health check at GET /health
 npm run seed -w server    # optional demo data
 npm run start -w server   # same as dev, without file watching
 ```
 
-- Port comes from `PORT` (default `3000`). The server binds `0.0.0.0`, so other devices on your LAN can reach it.
+- Port comes from `PORT` (default `4000`). The server binds `0.0.0.0`, so other devices on your LAN can reach it.
 - Database file comes from `DB_PATH` (default `server/data/loopy.db`, created automatically). The seed script uses the same variable and default.
 - Seeding creates the demo login **`demo` / `demopass1`** with some progress, plus 5 fake leaderboard users (`ada_loop`, `bode_plotter`, `nyquist_nina`, `pid_pete`, `root_locus`). Users that already exist are skipped, so re-running it is safe.
 
-Check that it is up: `curl http://localhost:3000/health` should print `{"ok":true}`.
+Check that it is up: `curl http://localhost:4000/health` should print `{"ok":true}`.
 
 ## Run the client
 
-The client reads the API base URL from `EXPO_PUBLIC_API_URL` (default `http://localhost:3000`). Metro inlines it at build time, so restart Expo after you change it.
+The client reads the API base URL from `EXPO_PUBLIC_API_URL` (default `http://localhost:4000`). Metro inlines it at build time, so restart Expo after you change it.
 
 ### In a browser
 
@@ -53,13 +53,13 @@ cd client && npx expo start --web     # or: npm run web -w client
 
    ```sh
    cd client
-   EXPO_PUBLIC_API_URL=http://<host-LAN-IP>:3000 npx expo start
+   EXPO_PUBLIC_API_URL=http://<host-LAN-IP>:4000 npx expo start
    ```
 
-   (On Windows PowerShell, use `$env:EXPO_PUBLIC_API_URL="http://<host-LAN-IP>:3000"; npx expo start`.)
+   (On Windows PowerShell, use `$env:EXPO_PUBLIC_API_URL="http://<host-LAN-IP>:4000"; npx expo start`.)
 5. Scan the QR code with Expo Go (Android) or the Camera app (iOS).
 
-`--tunnel` mode does not work inside the dev container because the egress firewall blocks it, so you need LAN mode. If you run inside the dev container, forward ports 3000 and 8081 to the host.
+`--tunnel` mode does not work inside the dev container because the egress firewall blocks it, so you need LAN mode. If you run inside the dev container, forward ports 4000 and 8081 to the host.
 
 ## Tests, typecheck, lint
 

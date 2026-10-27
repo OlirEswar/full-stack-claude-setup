@@ -15,9 +15,9 @@ describe('config', () => {
     return value;
   }
 
-  it('API_URL defaults to http://localhost:3000', () => {
+  it('API_URL defaults to http://localhost:4000', () => {
     delete process.env.EXPO_PUBLIC_API_URL;
-    expect(loadApiUrl()).toBe('http://localhost:3000');
+    expect(loadApiUrl()).toBe('http://localhost:4000');
   });
 
   it('API_URL uses EXPO_PUBLIC_API_URL when set', () => {
