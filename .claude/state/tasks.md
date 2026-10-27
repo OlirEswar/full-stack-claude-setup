@@ -252,7 +252,7 @@ Work top to bottom. Read `.claude/state/spec.md` for the data model, API shapes,
     - `failed status shows out-of-hearts screen`
     - `summary shows XP earned, accuracy and streak-extended banner`
 
-- [ ] **25. [frontend] Tabs + home/path screen**
+- [x] **25. [frontend] Tabs + home/path screen**
   - Files: `client/app/(tabs)/_layout.tsx` (Learn / Leaderboard / Achievements / Profile tabs), `client/app/(tabs)/index.tsx`, `client/src/components/path/` (`TopStatsBar`: streak, hearts with next-heart time, XP today vs goal ring; `DailyChallengeCard`; `MistakesCard` (shows count, hidden at 0); `SkillPath`: unit headers + zig-zag skill nodes with crown level, lock, due badge; tapping an unlocked node starts a lesson and routes to `/session/[id]`), `client/__tests__/home.test.tsx`.
   - Acceptance: `npm test -w client -- home` passes:
     - `renders unit titles and skill titles from /api/path`
