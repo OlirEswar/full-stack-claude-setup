@@ -10,10 +10,22 @@ import LoginScreen from '../app/(auth)/login';
 import RegisterScreen from '../app/(auth)/register';
 import TabsLayout from '../app/(tabs)/_layout';
 import HomeScreen from '../app/(tabs)/index';
+import ProfileScreen from '../app/(tabs)/profile';
 
 jest.mock('@/api/client', () => {
   const actual = jest.requireActual('@/api/client');
-  return { ...actual, login: jest.fn(), register: jest.fn(), getMe: jest.fn(), logout: jest.fn() };
+  // The home tab's data endpoints stay offline here; these tests only care about routing.
+  const offline = () => Promise.reject(new actual.ApiError(0, 'offline'));
+  return {
+    ...actual,
+    login: jest.fn(),
+    register: jest.fn(),
+    getMe: jest.fn(),
+    logout: jest.fn(),
+    getPath: jest.fn(offline),
+    getDaily: jest.fn(offline),
+    getMistakes: jest.fn(offline),
+  };
 });
 
 let mockStoredToken: string | null = null;
@@ -46,6 +58,7 @@ const routes = {
   '(auth)/register': RegisterScreen,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/profile': ProfileScreen,
 };
 
 async function renderApp(initialUrl = '/') {
@@ -168,7 +181,7 @@ describe('register screen', () => {
 
   it('logging out returns to /login', async () => {
     mockStoredToken = 'tok-old';
-    const app = await renderApp('/');
+    const app = await renderApp('/profile');
     await fireEvent.press(await screen.findByText('Log out'));
     expect(await screen.findByTestId('login-screen')).toBeTruthy();
     expect(app.getPathname()).toBe('/login');

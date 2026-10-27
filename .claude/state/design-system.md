@@ -106,6 +106,23 @@ Small custom SVG glyphs (flame, heart, bolt, alert, etc.) drawn with filled bodi
 optional 2px stroke, sized 16 / 20 / 24. Every StatPill icon uses its semantic color (streak, heart, xp).
 No icon font. Keep glyphs filled and chunky to match the type.
 
+Additional glyphs (same rules): `LockGlyph` (neutral `lockedTone` = ink 300/400), `CrownGlyph` (xp gold),
+`TraceGlyph` (a mini step response, single color: the motif as an icon), `LoopBackGlyph` (accent, mistakes),
+`TrophyGlyph` (xp), `MedalGlyph` (accent), `ProfileGlyph` (secondary).
+
+## Skill path and tab bar
+
+- **Unit banner**: solid face in the unit's tone with a 4px `shade` bottom edge, `xl` radius, on-color text.
+  Units cycle primary → secondary → accent so chapters read as distinct. Crowns earned/total in a `shade` pill.
+- **Skill node**: 72px circle, 6px `shade` bottom edge that collapses on press. Face: unit tone (open),
+  xp gold (fully crowned), `disabled` ink (locked, with lock glyph). An 6px ring around the node fills with
+  lessons-in-level progress. Crown level in an xp-tint pill bottom-right; "Due" in a streak-orange pill top-right.
+  Nodes wind in a zig-zag (offsets 0, ±0.75, ±1.15 × 64px); "Start here" bubble above the first untouched open skill.
+- **Tab bar**: surface with a 2px `ink.200` top border; labels use `label` type at 11px. Active tab icon sits in a
+  48×32 `md`-radius pill filled with its tone's tint and bordered in its base color; inactive glyphs use `lockedTone`.
+- **Top stats bar**: streak and hearts `StatPill`s with a caption under each (next-heart countdown), plus a 44px
+  daily-goal ring (xp gold arc, turns success green once the goal is met).
+
 ## Motion
 
 RN `Animated` only (no Framer). Press feedback is instant (edge collapse). Progress fills ease

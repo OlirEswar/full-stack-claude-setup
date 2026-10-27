@@ -6,5 +6,19 @@ export { Screen, type ScreenProps } from './Screen';
 export { Text, type TextProps, type TextTone } from './Text';
 export { EmptyState, ErrorState, LoadingState, type EmptyStateProps, type ErrorStateProps, type LoadingStateProps } from './states';
 export { StepResponseMark, type StepResponseMarkProps } from './StepResponseMark';
-export { AlertGlyph, BoltGlyph, FlameGlyph, HeartGlyph, type GlyphProps } from './icons';
+export {
+  AlertGlyph,
+  BoltGlyph,
+  CrownGlyph,
+  FlameGlyph,
+  HeartGlyph,
+  LockGlyph,
+  LoopBackGlyph,
+  MedalGlyph,
+  ProfileGlyph,
+  TraceGlyph,
+  TrophyGlyph,
+  lockedTone,
+  type GlyphProps,
+} from './icons';
 export { TextField, type TextFieldProps } from './TextField';
