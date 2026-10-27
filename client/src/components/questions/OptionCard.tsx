@@ -162,7 +162,7 @@ export function CheckGlyph({ color, size = 16 }: { color: string; size?: number 
   );
 }
 
-function CrossGlyph({ color, size = 16 }: { color: string; size?: number }) {
+export function CrossGlyph({ color, size = 16 }: { color: string; size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 16 16">
       <Path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke={color} strokeWidth={2.5} fill="none" strokeLinecap="round" />
