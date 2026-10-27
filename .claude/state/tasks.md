@@ -263,7 +263,7 @@ Work top to bottom. Read `.claude/state/spec.md` for the data model, API shapes,
     - `mistakes card hidden when count is 0`
     - `loading and error states render`
 
-- [ ] **26. [frontend] Daily challenge screen**
+- [x] **26. [frontend] Daily challenge screen**
   - Files: `client/app/daily.tsx`, `client/src/components/path/DailyChallengeCard.tsx` (link/status), `client/__tests__/daily.test.tsx`.
   - Acceptance: `npm test -w client -- daily` passes:
     - `not_started shows Start and 5 questions · ~3 min`
