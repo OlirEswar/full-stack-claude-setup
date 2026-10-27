@@ -1,4 +1,4 @@
-import { useRouter, type Href } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -118,7 +118,7 @@ export default function HomeScreen() {
           ) : null}
         </View>
 
-        {daily ? <DailyChallengeCard daily={daily} onPress={() => router.push('/daily' as Href)} /> : null}
+        {daily ? <DailyChallengeCard daily={daily} onPress={() => router.push('/daily')} /> : null}
 
         <MistakesCard
           count={mistakes?.count ?? 0}

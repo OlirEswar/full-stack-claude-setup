@@ -14,7 +14,7 @@ const copy: Record<DailyResponse['status'], { tone: Tone; eyebrow: string; title
     tone: 'streak',
     eyebrow: 'Daily challenge',
     title: 'Keep your streak burning',
-    body: (n) => `${n} quick questions from your due and shakiest skills. About 3 minutes, no hearts at stake.`,
+    body: (n) => `${n} questions · ~3 min, drawn from your due and shakiest skills. No hearts at stake.`,
     cta: 'Start',
   },
   in_progress: {

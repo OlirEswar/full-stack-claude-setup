@@ -52,6 +52,7 @@ export function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="session/[id]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="session/summary" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="daily" />
       </Stack.Protected>
       <Stack.Protected guard={!isAuthenticated} redirectTo="/">
         <Stack.Screen name="(auth)" />
