@@ -291,7 +291,7 @@ Work top to bottom. Read `.claude/state/spec.md` for the data model, API shapes,
 
 ## Docs
 
-- [ ] **29. [backend] Root README with run instructions**
+- [x] **29. [backend] Root README with run instructions**
   - Files: `README.md` (root only).
   - Contents: prerequisites (Node 22.13+, npm); `npm install` at root; `npm run dev -w server` (port 3000, binds 0.0.0.0) and `npm run seed -w server`; browser: `cd client && npx expo start --web`; phone: install Expo Go, put phone and host on the same LAN, `EXPO_PUBLIC_API_URL=http://<host-LAN-IP>:3000 npx expo start` then scan the QR (mention `--tunnel` is unavailable behind the egress firewall, and how to find the LAN IP on macOS/Linux/Windows); running `npm test` / `typecheck` / `lint`; `npx expo export --platform web`; project layout overview; content authoring notes (where units live, generator contract, no-LaTeX rule, run `npm test -w server -- content`).
   - Acceptance: `README.md` exists and contains the literal strings `EXPO_PUBLIC_API_URL`, `expo start --web`, `Expo Go`, `npm run dev -w server`, and `npm test` (checkable with `grep -c`). Every command in it matches a script that exists in the respective `package.json`.
